@@ -1,0 +1,124 @@
+enable
+conf t
+
+//Router 6
+//WAN
+
+interface Se0/0/1
+ip address 11.0.0.1 255.255.255.0
+no shutdown
+exit
+
+//a multilayer switch
+interface fa0/0
+no shutdown
+exit
+
+	//subInterface de data
+	interface fa0/0.1
+	encapsulation dot1Q 2
+	ip address 192.168.1.1 255.255.255.0
+	exit
+	
+	//subInterface de voz
+	interface fa0/0.10
+	encapsulation dot1Q 10
+	ip address 192.168.10.1 255.255.255.0
+	exit
+	
+//conigurar DHCP vlan de datos
+ip dhcp pool data
+network 192.168.1.0 255.255.255.0
+default-router 192.168.1.1
+exit
+
+//conigurar DHCP vlan de voz
+ip dhcp pool data
+network 192.168.10.0 255.255.255.0
+default-router 192.168.10.1
+
+//dirección ip del servidor VoIP local
+option 150 ip 192.168.10.1
+exit
+
+//contral telefonica
+telephony-service
+max-ephones 5
+max-dn 5
+
+//ip de servidor local
+ip source-address 192.168.10.1 port 2000
+auto assign 4 to 6
+auto assign 1 to 5
+exit
+
+//asignacion de numeros (extenciones)
+ephone-dn 1
+number 54001
+exit
+
+ephone-dn 2
+number 54002
+exit
+
+router eigrp 10
+network 192.168.1.0 0.0.0.255
+network 192.168.10.0 0.0.0.255
+network 11.0.0.0 0.0.0.255
+no auto-summary
+
+passive-interface fa0/0
+exit
+
+
+
+
+
+
+//switch 10
+enable
+conf t
+interface fa0/1
+switchport trunk encapsulation dot1Q
+switchport mode trunk
+switchport trunk allowed vlan 2,10
+exit
+
+
+//crear vlan
+vlan 2
+exit
+vlan 10
+exit
+
+//configurar puertos de acceso (la misma para 2 y 3)
+interface range f0/2-3
+switchport voice vlan 10
+switchport mode access
+switchport access vlan 2
+
+//puertos de seguridad
+switchport port-security
+(del telefono y del equipo)
+switchport port-security maximum 2
+switchport port-security violation restrict
+exit
+
+//ir a primer PC y verificar que de dhcp--> desktop
+
+/activar puertos poe en multilayer para no usar adaptadores
+interface range f0/2-3
+power inline auto
+exit
+
+
+
+copy running-config startup-config
+
+
+
+
+
+
+
+
