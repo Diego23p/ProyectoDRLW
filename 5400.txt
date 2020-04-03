@@ -1,10 +1,10 @@
+//Router 1
+//WAN
+
 enable
 conf t
 
-//Router 6
-//WAN
-
-interface Se0/0/1
+interface Se0/0/0
 ip address 11.0.0.1 255.255.255.0
 no shutdown
 exit
@@ -70,12 +70,31 @@ no auto-summary
 passive-interface fa0/0
 exit
 
+//dial-peer
+dial-peer voice 1 voip
+destination-pattern 5500.
+session target ipv4:12.0.0.1
+exit
+dial-peer voice 2 voip
+destination-pattern 5600.
+session target ipv4:11.0.0.2
+exit
+dial-peer voice 3 voip
+destination-pattern 5700.
+session target ipv4:13.0.0.2
+exit
+
+
+
+exit
+copy running-config startup-config
 
 
 
 
 
-//switch 10
+
+//switch 1
 enable
 conf t
 interface fa0/1
@@ -110,9 +129,7 @@ exit
 interface range f0/2-3
 power inline auto
 exit
-
-
-
+exit
 copy running-config startup-config
 
 
