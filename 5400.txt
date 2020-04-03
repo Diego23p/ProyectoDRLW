@@ -41,7 +41,7 @@ default-router 192.168.10.1
 option 150 ip 192.168.10.1
 exit
 
-//contral telefonica
+//central telefonica
 telephony-service
 max-ephones 5
 max-dn 5
